@@ -26,7 +26,7 @@ logging.getLogger("werkzeug").disabled = True
 app.logger.disabled = True
 
 print("CatProxy")
-print("Version: 0.1.2")
+print("Version: 0.1.1")
 print("https://github.com/Instel12/CatProxy/")
 print(f"\nProxy starting at http://127.0.0.1:{port}/{proxyRoute}/")
 
