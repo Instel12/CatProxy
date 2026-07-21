@@ -18,8 +18,8 @@ Your proxy will be running on port 6769 (haha, funny? what am i even saying)
 
 How to use it: (it's **REALLY** easy)
 
-    So, you can set in the config and port in `config.json` so the URL will vary.
+    1. So, you can set in the config and port in `config.json` so the URL will vary.
 
-    By default, it would be http://127.0.0.1:6769/CatProxy/(URL)
-
-    If you knew what you were doing in the config, you'll understand how the URL will vary.
+    2. By default, it would be http://127.0.0.1:6769/CatProxy/(URL)
+    
+    3. If you knew what you were doing in the config, you'll understand how the URL will vary.
