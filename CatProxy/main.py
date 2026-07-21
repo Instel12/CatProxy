@@ -14,9 +14,9 @@ cli.disabled = True
 with open("config.json", "r") as file:
     config = json.load(file)
 
-
 port = config["Port"]
 proxyRoute = config["ProxyRoute"]
+hostStatic = config["HostStatic"]
 
 app = Flask(__name__)
 app.logger.disabled = True
@@ -84,5 +84,22 @@ def proxy(url):
 @app.route("/Inject/<path:filename>")
 def injectStatic(filename):
     return send_from_directory("Inject", filename)
+
+@app.route("/path:<filename>")
+def staticFile(filename):
+    if hostStatic:
+        print(f'Requested "{filename}"')
+        return send_from_directory("Static", filename)
+
+
+@app.route("/")
+def index():
+    if hostStatic:
+        print('Requested "index.html"')
+        return send_from_directory("Static", "index.html")
+
+@app.errorhandler(404)
+def four04(error):
+    return send_from_directory("Static", "404.html"), 404
 
 app.run(port=port)
