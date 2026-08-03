@@ -4,11 +4,10 @@ from urllib.parse import urljoin, urlsplit, urlunsplit
 import requests
 import os
 import json
+from CatProxy.Patches.cssPatch import *
 from html import escape
 import logging
-
-from Patches.cssPatch import *
-from Patches.urlPatch import *
+import base64
 
 cli = logging.getLogger("werkzeug")
 cli.disabled = True
@@ -16,9 +15,9 @@ cli.disabled = True
 with open("config.json", "r") as file:
     config = json.load(file)
 
+
 port = config["Port"]
 proxyRoute = config["ProxyRoute"]
-hostStatic = config["HostStatic"]
 
 app = Flask(__name__)
 app.logger.disabled = True
@@ -28,7 +27,7 @@ logging.getLogger("werkzeug").disabled = True
 app.logger.disabled = True
 
 print("CatProxy")
-print("Version: 0.1.1")
+print("Version: 0.1.0")
 print("https://github.com/Instel12/CatProxy/")
 print(f"\nProxy starting at http://127.0.0.1:{port}/{proxyRoute}/")
 
@@ -49,15 +48,10 @@ def proxy(url):
 
     r = requests.get(url)
     content_type = r.headers.get("Content-Type", "")
-    base = urljoin(url, "./")
 
     if "text/css" in content_type:
         css = rewriteCSS(r.text, url, proxyRoute)
         return Response(css, status=r.status_code, content_type=content_type)
-    
-    if "javascript" in content_type or "ecmascript" in content_type:
-        js = patchURL(r.text, base, url)
-        return Response(js, status=r.status_code, content_type=content_type)
 
     if "text/html" in content_type:
         HTMLconent = r.text
@@ -68,7 +62,13 @@ def proxy(url):
                 if file.endswith(".js"):
                     scripts += f"<script src='/Inject/{file}'></script>\n"
 
-        injection = f"<script>window.CatProxyBase = '{escape(base)}';\nwindow.CatProxyOriginalUrl = '{escape(url)}';\nwindow.CatProxyRoute = '{proxyRoute}';</script>" + scripts
+        base = urljoin(url, "./")
+
+        injection = (
+            f"<script>window.CatProxyBase = '{escape(base)}';\n"
+            f"window.CatProxyOriginalUrl = '{escape(url)}';\n"
+            f"window.CatProxyRoute = '{proxyRoute}';</script>" + scripts
+        )
 
         if "<head>" in HTMLconent:
             HTMLconent = HTMLconent.replace("<head>", "<head>" + injection, 1)
@@ -76,9 +76,6 @@ def proxy(url):
             HTMLconent = HTMLconent.replace("</body>", injection + "</body>", 1)
         else:
             HTMLconent += injection
-
-        HTMLconent = patchURL(HTMLconent, base, url)
-        HTMLconent = rewriteCSS(HTMLconent, url, proxyRoute)
 
         return Response(HTMLconent, status=r.status_code, content_type=content_type)
 
@@ -88,21 +85,5 @@ def proxy(url):
 @app.route("/Inject/<path:filename>")
 def injectStatic(filename):
     return send_from_directory("Inject", filename)
-
-@app.route("/<path:filename>")
-def staticFile(filename):
-    if hostStatic:
-        print(f'Requested "{filename}"')
-        return send_from_directory("Static", filename)
-
-@app.route("/")
-def index():
-    if hostStatic:
-        print('Requested "index.html"')
-        return send_from_directory("Static", "index.html")
-
-@app.errorhandler(404)
-def four04(error):
-    return send_from_directory("Static", "404.html"), 404
 
 app.run(port=port)

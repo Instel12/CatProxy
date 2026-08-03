@@ -55,6 +55,19 @@
         return proxyRoute + resolved;
     }
 
+    function rewriteStyle(value) {
+        if (!value) {
+            return value;
+        }
+
+        return value.replace(
+            /url\(\s*(['"]?)(.*?)\1\s*\)/gi,
+            (match, quote, url) => {
+                return `url(${quote}${rewriteURL(url)}${quote})`;
+            }
+        );
+    }
+
     function rewriteSrcset(value) {
         if (!value) {
             return value;
@@ -79,8 +92,19 @@
     }
 
     function rewriteElements(root = document) {
-        root.querySelectorAll("[src], [href], [action], [poster], [srcset], [data-src], [data-href], [data-srcset]").forEach(element => {
-            const attributes = ["src", "href", "action", "poster", "srcset", "data-src", "data-href", "data-srcset"];
+        root.querySelectorAll("[src], [href], [action], [poster], [srcset], [data-src], [data-href], [data-srcset], [data-gif], [style]").forEach(element => {
+            const attributes = [
+                "src",
+                "href",
+                "action",
+                "poster",
+                "srcset",
+                "data-src",
+                "data-href",
+                "data-srcset",
+                "data-gif",
+                "style"
+            ];
 
             attributes.forEach(attr => {
                 const value = element.getAttribute(attr);
@@ -89,9 +113,15 @@
                     return;
                 }
 
-                const rewritten = attr === "srcset" || attr === "data-srcset"
-                    ? rewriteSrcset(value)
-                    : rewriteURL(value);
+                let rewritten;
+
+                if (attr === "srcset" || attr === "data-srcset") {
+                    rewritten = rewriteSrcset(value);
+                } else if (attr === "style") {
+                    rewritten = rewriteStyle(value);
+                } else {
+                    rewritten = rewriteURL(value);
+                }
 
                 if (rewritten !== value) {
                     element.setAttribute(attr, rewritten);
