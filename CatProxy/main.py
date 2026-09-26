@@ -19,6 +19,7 @@ with open("config.json", "r") as file:
 port = config["Port"]
 proxyRoute = config["ProxyRoute"]
 hostStatic = config["HostStatic"]
+debugLog = config["DebugLogging"]
 
 app = Flask(__name__)
 app.logger.disabled = True
@@ -34,7 +35,8 @@ print(f"\nProxy starting at http://127.0.0.1:{port}/{proxyRoute}/")
 
 @app.route(f"/{proxyRoute}/<path:url>")
 def proxy(url):
-    print(f"Requested \"{url}\"")
+    if debugLog:
+        print(f"Requested \"{url}\"")
 
     if not url.startswith(("http://", "https://")):
         url = "https://" + url
@@ -80,6 +82,9 @@ def proxy(url):
         HTMLconent = patchURL(HTMLconent, base, url)
         HTMLconent = rewriteCSS(HTMLconent, url, proxyRoute)
 
+        if debugLog:
+            HTMLconent += """<div style="position: fixed; left: 0; top: 0; z-index: 9999999; background-color: black; color: red; font-family: sans-serif; padding: 0; margin: 0; font-size: 10px;">Connections logged on backend!<br>In other words, you currently lack privacy from who's hosting the proxy.</div>"""
+
         return Response(HTMLconent, status=r.status_code, content_type=content_type)
 
     return Response(r.content, status=r.status_code, content_type=content_type)
@@ -92,13 +97,15 @@ def injectStatic(filename):
 @app.route("/<path:filename>")
 def staticFile(filename):
     if hostStatic:
-        print(f'Requested "{filename}"')
+        if debugLog:
+            print(f'Requested "{filename}"')
         return send_from_directory("Static", filename)
 
 @app.route("/")
 def index():
     if hostStatic:
-        print('Requested "index.html"')
+        if debugLog:
+            print('Requested "index.html"')
         return send_from_directory("Static", "index.html")
 
 @app.errorhandler(404)

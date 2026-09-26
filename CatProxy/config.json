@@ -1,5 +1,7 @@
 {
     "Port": 6769,
     "ProxyRoute": "CatProxy",
-    "HostStatic": true
+
+    "HostStatic": true,
+    "DebugLogging": true
 }
