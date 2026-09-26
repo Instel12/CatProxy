@@ -18,3 +18,16 @@ input{
     border: none;
     color: white;
 }
+
+iframe{
+    background-color: white;
+}
+
+#favicon{
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    height: 20px;
+    width: 20px;
+}

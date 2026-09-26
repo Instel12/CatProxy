@@ -3,6 +3,8 @@
 # 
 <img src="CatProxy/Images/Banner.png">
 
+I didn't think I would need to say this, but no I am not a furry nor a femboy, I named this CatProxy because my cat was by me while I was making this lol
+
 How you use this is up to you. I'm not responsible for what happens to you while using CatProxy.
 
 CatProxy is a proxy made in Python and JavaScript. That's all I can say about it.

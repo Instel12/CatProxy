@@ -86,7 +86,7 @@ def proxy(url):
         HTMLconent = rewriteCSS(HTMLconent, url, proxyRoute)
 
         if debugLog:
-            HTMLconent += """<div style="position: fixed; left: 0; top: 0; z-index: 9999999; background-color: black; color: red; font-family: sans-serif; padding: 0; margin: 0; font-size: 10px;">Connections logged on backend!<br>In other words, you currently lack privacy from who's hosting the proxy.</div>"""
+            HTMLconent += """<div style="position: fixed; left: 0; top: 0; z-index: 9999999; background-color: black; color: red; font-family: sans-serif; padding: 0; margin: 0; font-size: 10px;">Developer mode enabled!<br>In other words, you currently lack privacy from who's hosting the proxy.</div>"""
 
         return Response(HTMLconent, status=r.status_code, content_type=content_type)
 
