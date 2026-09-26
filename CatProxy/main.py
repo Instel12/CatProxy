@@ -29,12 +29,15 @@ logging.getLogger("werkzeug").disabled = True
 app.logger.disabled = True
 
 print("CatProxy")
-print("Version: 0.1.1")
+print("Version: 0.2.0 (Nightly)")
 print("https://github.com/Instel12/CatProxy/")
 print(f"\nProxy starting at http://127.0.0.1:{port}/{proxyRoute}/")
 
 @app.route(f"/{proxyRoute}/<path:url>")
 def proxy(url):
+    if url.startswith("cat://"):
+        return send_from_directory("Internal", url[6:] + "/index.html")
+
     if debugLog:
         print(f"Requested \"{url}\"")
 
@@ -93,6 +96,10 @@ def proxy(url):
 @app.route("/Inject/<path:filename>")
 def injectStatic(filename):
     return send_from_directory("Inject", filename)
+    
+@app.route("/Internal/<path:filename>")
+def internalStatic(filename):
+    return send_from_directory("Internal", filename)
 
 @app.route("/<path:filename>")
 def staticFile(filename):

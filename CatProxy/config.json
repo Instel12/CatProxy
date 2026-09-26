@@ -3,5 +3,5 @@
     "ProxyRoute": "CatProxy",
 
     "HostStatic": true,
-    "DebugLogging": true
+    "DebugLogging": false
 }
